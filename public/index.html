@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Banana Shop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Banana Shop 🍌</h1>
+  <p>Banana Bunch - $5</p>
+
+  <input id="qty" type="number" min="1" max="100" value="1" />
+  <button onclick="updateOrder()">Update Order</button>
+
+  <div class="box">
+    <h3>Your Order</h3>
+    <p>Banana Bunches: <span id="count">1</span></p>
+    <p>Total: $<span id="total">5</span></p>
+  </div>
+
+  <h3>Payment Details</h3>
+  <input id="cardName" type="text" placeholder="Name on Card" />
+  <input id="cardNumber" type="text" placeholder="Card Number" />
+  <input id="expiry" type="text" placeholder="MM/YY" />
+  <input id="cvv" type="password" placeholder="CVV" />
+
+  <button onclick="checkout()">Pay Now</button>
+  <p><strong>Demo only:</strong> Do not enter real payment information.</p>
+
+<script>
+  function updateOrder() {
+    const quantity = Number(document.getElementById("qty").value);
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+      alert("Quantity must be between 1 and 100");
+      return false;
+    }
+
+    document.getElementById("count").textContent = quantity;
+    document.getElementById("total").textContent = quantity * 5;
+    return true;
+  }
+
+  async function checkout() {
+    const valid = updateOrder();
+    if (!valid) return;
+
+    const quantity = Number(document.getElementById("qty").value);
+
+    const res = await fetch("/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quantity })
+    });
+
+    if (!res.ok) {
+      alert("Checkout failed");
+      return;
+    }
+
+    localStorage.removeItem("bananaCart");
+    window.location.href = "/success.html";
+  }
+</script>
+</body>
+</html>
